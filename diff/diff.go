@@ -1,7 +1,7 @@
 /* 	import "github.com/walf443/mig/diff"
-	func main() {
-		result := diff.Extract(before_schema, after_schema)
-	}
+func main() {
+	result := diff.Extract(before_schema, after_schema)
+}
 */
 package diff
 
@@ -9,16 +9,22 @@ import (
 	"github.com/walf443/sqlparser/mysql"
 )
 
-type SchemaDifference struct {
-	Added []mysql.Statement
-	Removed []mysql.Statement
+type DatabaseSchemaDifference struct {
+	Added    []mysql.Statement
+	Removed  []mysql.Statement
 	Modified []mysql.Statement
 }
 
-func Extract(before []mysql.Statement, after []mysql.Statement) *SchemaDifference {
-	var result SchemaDifference
+type TableSchemaDifference struct {
+	Added    []mysql.CreateDefinition
+	Removed  []mysql.CreateDefinition
+	Modified []mysql.CreateDefinition
+}
 
-	tableNameOf := make(map[string]mysql.Statement)
+func Extract(before []mysql.Statement, after []mysql.Statement) *DatabaseSchemaDifference {
+	var result DatabaseSchemaDifference
+
+	tableNameOf := make(map[string]*mysql.CreateTableStatement)
 	for _, stmt := range before {
 		if v, ok := stmt.(*mysql.CreateTableStatement); ok {
 			key := v.TableName.ToQuery()
@@ -31,6 +37,9 @@ func Extract(before []mysql.Statement, after []mysql.Statement) *SchemaDifferenc
 			key := v.TableName.ToQuery()
 			if _, ok := tableNameOf[key]; ok {
 				// TODO: detect Modified
+				if v.ToQuery() != tableNameOf[key].ToQuery() {
+					result.Modified = append(result.Modified, v) // 変更前のデータが構造的に必要
+				}
 				delete(tableNameOf, key)
 			} else {
 				result.Added = append(result.Added, v)
@@ -40,6 +49,68 @@ func Extract(before []mysql.Statement, after []mysql.Statement) *SchemaDifferenc
 
 	for _, statement := range tableNameOf {
 		result.Removed = append(result.Removed, statement)
+	}
+
+	return &result
+}
+
+// TODO: How to check primary key difference?
+func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.CreateTableStatement) *TableSchemaDifference {
+	var result TableSchemaDifference
+	columnNameOf := make(map[string]mysql.CreateDefinition)
+	indexNameOf := make(map[string]mysql.CreateDefinition)
+	for _, definition := range x.CreateDefinitions {
+		if v, ok := definition.(*mysql.CreateDefinitionColumn); ok {
+			key := v.ColumnName.ToQuery()
+			columnNameOf[key] = definition
+		}
+		if v, ok := definition.(*mysql.CreateDefinitionIndex); ok {
+			key := v.Name.ToQuery()
+			indexNameOf[key] = definition
+		}
+		if v, ok := definition.(*mysql.CreateDefinitionUniqueIndex); ok {
+			key := v.Name.ToQuery()
+			indexNameOf[key] = definition
+		}
+	}
+
+	for _, definition := range y.CreateDefinitions {
+		if v, ok := definition.(*mysql.CreateDefinitionColumn); ok {
+			key := v.ColumnName.ToQuery()
+			if _, ok := columnNameOf[key]; ok {
+				delete(columnNameOf, key)
+				// TODO: check modified
+			} else {
+				result.Added = append(result.Added, definition)
+			}
+		}
+		if v, ok := definition.(*mysql.CreateDefinitionIndex); ok {
+			key := v.Name.ToQuery()
+			indexNameOf[key] = definition
+			if _, ok := indexNameOf[key]; ok {
+				delete(indexNameOf, key)
+				// TODO: check modified
+			} else {
+				result.Added = append(result.Added, definition)
+			}
+		}
+		if v, ok := definition.(*mysql.CreateDefinitionUniqueIndex); ok {
+			key := v.Name.ToQuery()
+			indexNameOf[key] = definition
+			if _, ok := indexNameOf[key]; ok {
+				delete(indexNameOf, key)
+				// TODO: check modified
+			} else {
+				result.Added = append(result.Added, definition)
+			}
+		}
+	}
+
+	for _, definition := range columnNameOf {
+		result.Removed = append(result.Removed, definition)
+	}
+	for _, definition := range indexNameOf {
+		result.Removed = append(result.Removed, definition)
 	}
 
 	return &result
