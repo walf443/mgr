@@ -6,8 +6,8 @@ func main() {
 package diff
 
 import (
-	"github.com/walf443/sqlparser/mysql"
 	// "github.com/k0kubun/pp"
+	"github.com/walf443/sqlparser/mysql"
 )
 
 type DatabaseSchemaDifference struct {
@@ -91,7 +91,6 @@ func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.Create
 			}
 		case *mysql.CreateDefinitionIndex:
 			key := v.Name.ToQuery()
-			indexNameOf[key] = definition
 			if _, ok := indexNameOf[key]; ok {
 				delete(indexNameOf, key)
 				// TODO: check modified
@@ -100,7 +99,6 @@ func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.Create
 			}
 		case *mysql.CreateDefinitionUniqueIndex:
 			key := v.Name.ToQuery()
-			indexNameOf[key] = definition
 			if _, ok := indexNameOf[key]; ok {
 				delete(indexNameOf, key)
 				// TODO: check modified
