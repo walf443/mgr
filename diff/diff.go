@@ -7,6 +7,7 @@ package diff
 
 import (
 	"github.com/walf443/sqlparser/mysql"
+	// "github.com/k0kubun/pp"
 )
 
 type DatabaseSchemaDifference struct {
@@ -65,22 +66,22 @@ func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.Create
 	columnNameOf := make(map[string]mysql.CreateDefinition)
 	indexNameOf := make(map[string]mysql.CreateDefinition)
 	for _, definition := range x.CreateDefinitions {
-		if v, ok := definition.(*mysql.CreateDefinitionColumn); ok {
+		switch v := definition.(type) {
+		case *mysql.CreateDefinitionColumn:
 			key := v.ColumnName.ToQuery()
 			columnNameOf[key] = definition
-		}
-		if v, ok := definition.(*mysql.CreateDefinitionIndex); ok {
+		case *mysql.CreateDefinitionIndex:
 			key := v.Name.ToQuery()
 			indexNameOf[key] = definition
-		}
-		if v, ok := definition.(*mysql.CreateDefinitionUniqueIndex); ok {
+		case *mysql.CreateDefinitionUniqueIndex:
 			key := v.Name.ToQuery()
 			indexNameOf[key] = definition
 		}
 	}
 
 	for _, definition := range y.CreateDefinitions {
-		if v, ok := definition.(*mysql.CreateDefinitionColumn); ok {
+		switch v := definition.(type) {
+		case *mysql.CreateDefinitionColumn:
 			key := v.ColumnName.ToQuery()
 			if _, ok := columnNameOf[key]; ok {
 				delete(columnNameOf, key)
@@ -88,8 +89,7 @@ func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.Create
 			} else {
 				result.Added = append(result.Added, definition)
 			}
-		}
-		if v, ok := definition.(*mysql.CreateDefinitionIndex); ok {
+		case *mysql.CreateDefinitionIndex:
 			key := v.Name.ToQuery()
 			indexNameOf[key] = definition
 			if _, ok := indexNameOf[key]; ok {
@@ -98,8 +98,7 @@ func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.Create
 			} else {
 				result.Added = append(result.Added, definition)
 			}
-		}
-		if v, ok := definition.(*mysql.CreateDefinitionUniqueIndex); ok {
+		case *mysql.CreateDefinitionUniqueIndex:
 			key := v.Name.ToQuery()
 			indexNameOf[key] = definition
 			if _, ok := indexNameOf[key]; ok {
