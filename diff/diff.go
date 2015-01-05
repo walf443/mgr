@@ -16,6 +16,8 @@ type DatabaseSchemaDifference struct {
 }
 
 type TableSchemaDifference struct {
+	Before   *mysql.CreateTableStatement
+	After    *mysql.CreateTableStatement
 	Added    []mysql.CreateDefinition
 	Removed  []mysql.CreateDefinition
 	Modified []mysql.CreateDefinition
@@ -57,6 +59,9 @@ func Extract(before []mysql.Statement, after []mysql.Statement) *DatabaseSchemaD
 // TODO: How to check primary key difference?
 func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.CreateTableStatement) *TableSchemaDifference {
 	var result TableSchemaDifference
+	result.Before = x
+	result.After = y
+
 	columnNameOf := make(map[string]mysql.CreateDefinition)
 	indexNameOf := make(map[string]mysql.CreateDefinition)
 	for _, definition := range x.CreateDefinitions {
