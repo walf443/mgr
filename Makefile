@@ -6,7 +6,4 @@ sqlparser_test:
 diff_test: sqlparser_test
 	cd diff && make test
 
-get-deps:
-	go get github.com/walf443/sqlparser/mysql
-
-.PHONY: test get-deps
+.PHONY: test
