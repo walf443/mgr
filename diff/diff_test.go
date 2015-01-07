@@ -24,7 +24,7 @@ func TestDiffDatabase(t *testing.T) {
 
 func TestDiffTable(t *testing.T) {
 	before := "CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, foo int(10) unsigned not null, key foo (foo))"
-	after  := "CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, bar int(10) unsigned not null, key bar (bar))"
+	after := "CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, bar int(10) unsigned not null, key bar (bar))"
 	beforeStmt := parseCreateTableStatement(t, before)
 	afterStmt := parseCreateTableStatement(t, after)
 	result := ExtractTableSchemaDifference(beforeStmt, afterStmt)
