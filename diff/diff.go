@@ -7,7 +7,7 @@ package diff
 
 import (
 	// "github.com/k0kubun/pp"
-	"github.com/walf443/sqlparser/mysql"
+	"github.com/walf443/mig/sqlparser/mysql"
 )
 
 type DatabaseSchemaDifference struct {

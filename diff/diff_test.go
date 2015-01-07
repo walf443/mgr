@@ -4,7 +4,7 @@ import (
 	// "github.com/k0kubun/pp"
 	"testing"
 
-	"github.com/walf443/sqlparser/mysql"
+	"github.com/walf443/mig/sqlparser/mysql"
 )
 
 func TestDiffDatabase(t *testing.T) {
