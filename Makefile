@@ -9,4 +9,7 @@ sqlparser_test:
 diff_test: sqlparser_test
 	cd diff && make test
 
-.PHONY: test
+get-deps:
+	go get github.com/k0kubun/pp
+
+.PHONY: test sqlparser_test diff_test make-deps
