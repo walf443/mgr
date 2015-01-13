@@ -1,4 +1,7 @@
-test: diff_test
+test: mgr
+
+mgr: cli/*.go diff_test sqlparser_test
+	cd cli && go build -o ../mgr
 
 sqlparser_test:
 	cd sqlparser && make test
