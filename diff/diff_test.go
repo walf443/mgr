@@ -1,11 +1,20 @@
 package diff
 
 import (
-	// "github.com/k0kubun/pp"
+	"github.com/k0kubun/pp"
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/walf443/mig/sqlparser/mysql"
 )
+
+func init() {
+	if os.Getenv("DEBUG") == "" {
+		pp.SetDefaultOutput(ioutil.Discard)
+	}
+}
+
 
 func TestDiffDatabase(t *testing.T) {
 	before := "CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT); CREATE TABLE foo (id int unsigned not null AUTO_INCREMENT);"
@@ -13,7 +22,7 @@ func TestDiffDatabase(t *testing.T) {
 	beforeStmt := parseSQL(t, before)
 	afterStmt := parseSQL(t, after)
 	result := Extract(beforeStmt, afterStmt)
-	// pp.Print(result)
+	pp.Print(result)
 	if !checkTable(result.Added[0], "`bar`") {
 		t.Errorf("bar should be added")
 	}
