@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/k0kubun/pp"
-	"github.com/walf443/mig/sqlparser/mysql"
-	"github.com/walf443/mig/diff"
+	"github.com/walf443/mgr/sqlparser/mysql"
+	"github.com/walf443/mgr/diff"
 	"io/ioutil"
 	"os"
 )

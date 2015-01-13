@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/walf443/mig/sqlparser/mysql"
+	"github.com/walf443/mgr/sqlparser/mysql"
 )
 
 func init() {

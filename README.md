@@ -1,4 +1,4 @@
-# mig  [![Build Status](https://secure.travis-ci.org/walf443/mig.png)](http://travis-ci.org/walf443/mig)
+# mgr [![Build Status](https://secure.travis-ci.org/walf443/mgr.png)](http://travis-ci.org/walf443/mgr)
 
 ## What is it?
 

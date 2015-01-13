@@ -1,4 +1,4 @@
-/* 	import "github.com/walf443/mig/diff"
+/* 	import "github.com/walf443/mgr/diff"
 func main() {
 	result := diff.Extract(before_schema, after_schema)
 }
@@ -7,7 +7,7 @@ package diff
 
 import (
 	// "github.com/k0kubun/pp"
-	"github.com/walf443/mig/sqlparser/mysql"
+	"github.com/walf443/mgr/sqlparser/mysql"
 )
 
 type DatabaseSchemaDifference struct {
