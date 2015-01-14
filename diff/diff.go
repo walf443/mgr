@@ -13,7 +13,7 @@ import (
 type DatabaseSchemaDifference struct {
 	Added    []mysql.Statement
 	Removed  []mysql.Statement
-	Modified []mysql.Statement
+	Modified []TableSchemaDifference
 }
 
 type TableSchemaDifference struct {
@@ -41,7 +41,7 @@ func Extract(before []mysql.Statement, after []mysql.Statement) *DatabaseSchemaD
 			if _, ok := tableNameOf[key]; ok {
 				// TODO: detect Modified
 				if v.ToQuery() != tableNameOf[key].ToQuery() {
-					result.Modified = append(result.Modified, v) // 変更前のデータが構造的に必要
+					result.Modified = append(result.Modified, ExtractTableSchemaDifference(tableNameOf[key], v))
 				}
 				delete(tableNameOf, key)
 			} else {
@@ -58,7 +58,7 @@ func Extract(before []mysql.Statement, after []mysql.Statement) *DatabaseSchemaD
 }
 
 // TODO: How to check primary key difference?
-func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.CreateTableStatement) *TableSchemaDifference {
+func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.CreateTableStatement) TableSchemaDifference {
 	var result TableSchemaDifference
 	result.Before = x
 	result.After = y
@@ -115,7 +115,7 @@ func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.Create
 		result.Removed = append(result.Removed, definition)
 	}
 
-	return &result
+	return result
 }
 
 func (x *DatabaseSchemaDifference) Changes() []string {
