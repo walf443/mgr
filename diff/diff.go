@@ -117,3 +117,31 @@ func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.Create
 
 	return &result
 }
+
+func (x *DatabaseSchemaDifference) Changes() []string {
+	var sqls []string
+	for _, stmt := range(x.Added) {
+		if v, ok := stmt.(*mysql.CreateTableStatement); ok {
+			newStmt := convertCreateTableStatement(v)
+			sqls = append(sqls, newStmt.ToQuery())
+		}
+	}
+	for _, stmt := range(x.Removed) {
+		if v, ok := stmt.(*mysql.CreateTableStatement); ok {
+			newStmt := convertDropTableStatement(v)
+			sqls = append(sqls, newStmt.ToQuery())
+		}
+	}
+
+	return sqls
+}
+
+func convertCreateTableStatement(stmt *mysql.CreateTableStatement) mysql.Statement {
+	return stmt
+}
+
+func convertDropTableStatement(stmt *mysql.CreateTableStatement) mysql.Statement {
+	newStmt := mysql.DropTableStatement{[]mysql.TableNameIdentifier{}}
+	newStmt.TableNames = append(newStmt.TableNames, stmt.TableName)
+	return &newStmt
+}

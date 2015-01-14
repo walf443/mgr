@@ -45,11 +45,8 @@ func main() {
 		os.Exit(1)
 	}
 	result := diff.Extract(beforeStmts, afterStmts)
-	for _, stmt := range(result.Added) {
-		fmt.Println(stmt.ToQuery())
-	}
-	for _, stmt := range(result.Removed) {
-		fmt.Println(stmt.ToQuery())
+	for _, stmt := range(result.Changes()) {
+		fmt.Println(stmt)
 	}
 	pp.Print(result)
 }
