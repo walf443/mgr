@@ -41,6 +41,13 @@ func TestDiffTable(t *testing.T) {
 	)
 	testDiffTable(
 		t,
+		"same case",
+		"CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, foo int(10) unsigned not null, key foo (foo))",
+		"CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, foo int(10) unsigned not null, key foo (foo))",
+		"",
+	)
+	testDiffTable(
+		t,
 		"unique key",
 		"CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, foo int(10) unsigned not null, unique key foo (foo))",
 		"CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, bar int(10) unsigned not null, unique key bar (bar))",

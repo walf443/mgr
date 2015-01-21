@@ -134,6 +134,11 @@ func (x *DatabaseSchemaDifference) Changes() []string {
 }
 
 func (x *TableSchemaDifference) ToQuery() string {
+
+	if ( len(x.Added) == 0 && len(x.Removed) == 0 && len(x.Modified) == 0 ) {
+		return "";
+	}
+
 	var specs []mysql.AlterSpecification
 	for _, def := range x.Removed {
 		switch def := def.(type) {
