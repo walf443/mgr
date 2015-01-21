@@ -14,6 +14,17 @@ you should only manage database's schema's sql file.
 
 I'd like to use MySQL's specific feature. So you just write create table statement to file.
 
+
+## USAGE
+
+```
+$ mgr
+
+# specify target file manualy.
+$ mgr -before before.sql -after after.sql
+$ cat before.sql | mgr -after after.sql
+```
+
 SEE ALSO
 -----------
 
