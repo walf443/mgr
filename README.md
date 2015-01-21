@@ -22,7 +22,7 @@ $ mgr
 
 # specify target file manualy.
 $ mgr -before before.sql -after after.sql
-$ cat before.sql | mgr -before=stdin -after after.sql
+$ mysqldump  --compact --no-data -u root -p your_database | ./mgr -before=stdin -after=schema.sql
 ```
 
 SEE ALSO
