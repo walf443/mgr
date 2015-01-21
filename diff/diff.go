@@ -1,12 +1,6 @@
-/* 	import "github.com/walf443/mgr/diff"
-func main() {
-	result := diff.Extract(before_schema, after_schema)
-}
-*/
 package diff
 
 import (
-	// "github.com/k0kubun/pp"
 	"github.com/walf443/mgr/sqlparser/mysql"
 )
 
@@ -120,20 +114,75 @@ func ExtractTableSchemaDifference(x *mysql.CreateTableStatement, y *mysql.Create
 
 func (x *DatabaseSchemaDifference) Changes() []string {
 	var sqls []string
-	for _, stmt := range(x.Added) {
+	for _, stmt := range x.Added {
 		if v, ok := stmt.(*mysql.CreateTableStatement); ok {
 			newStmt := convertCreateTableStatement(v)
 			sqls = append(sqls, newStmt.ToQuery())
 		}
 	}
-	for _, stmt := range(x.Removed) {
+	for _, stmt := range x.Removed {
 		if v, ok := stmt.(*mysql.CreateTableStatement); ok {
 			newStmt := convertDropTableStatement(v)
 			sqls = append(sqls, newStmt.ToQuery())
 		}
 	}
 
+	for _, stmt := range x.Modified {
+		sqls = append(sqls, stmt.ToQuery())
+	}
+
 	return sqls
+}
+
+func (x *TableSchemaDifference) ToQuery() string {
+	var specs []mysql.AlterSpecification
+	for _, def := range x.Removed {
+		switch def := def.(type) {
+		case *mysql.CreateDefinitionColumn:
+			spec := mysql.AlterSpecificationDropColumn{}
+			spec.ColumnName = def.ColumnName
+			specs = append(specs, &spec)
+		case *mysql.CreateDefinitionPrimaryIndex:
+			// TODO
+		case *mysql.CreateDefinitionUniqueIndex:
+			spec := mysql.AlterSpecificationDropIndex{}
+			spec.Name = def.Name
+			specs = append(specs, &spec)
+		case *mysql.CreateDefinitionIndex:
+			spec := mysql.AlterSpecificationDropIndex{}
+			spec.Name = def.Name
+			specs = append(specs, &spec)
+		default:
+		}
+	}
+	for _, def := range x.Added {
+		switch def := def.(type) {
+		case *mysql.CreateDefinitionColumn:
+			spec := mysql.AlterSpecificationAddColumn{}
+			spec.ColumnName = def.ColumnName
+			spec.ColumnDefinition = def.ColumnDefinition
+			specs = append(specs, &spec)
+		case *mysql.CreateDefinitionPrimaryIndex:
+		case *mysql.CreateDefinitionUniqueIndex:
+			spec := mysql.AlterSpecificationAddIndex{}
+			spec.Name = def.Name
+			spec.Columns = def.Columns
+			spec.Unique = true
+			specs = append(specs, &spec)
+		case *mysql.CreateDefinitionIndex:
+			spec := mysql.AlterSpecificationAddIndex{}
+			spec.Name = def.Name
+			spec.Columns = def.Columns
+			spec.Unique = false
+			specs = append(specs, &spec)
+		default:
+		}
+	}
+	stmt := new(mysql.AlterTableStatement)
+	stmt.TableName = x.Before.TableName
+	stmt.AlterSpecifications = specs
+
+	return stmt.ToQuery()
 }
 
 func convertCreateTableStatement(stmt *mysql.CreateTableStatement) mysql.Statement {
