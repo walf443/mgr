@@ -32,33 +32,29 @@ func TestDiffDatabase(t *testing.T) {
 }
 
 func TestDiffTable(t *testing.T) {
-	before := "CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, foo int(10) unsigned not null, key foo (foo))"
-	after := "CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, bar int(10) unsigned not null, key bar (bar))"
+	testDiffTable(
+		t,
+		"general case",
+		"CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, foo int(10) unsigned not null, key foo (foo))",
+		"CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, bar int(10) unsigned not null, key bar (bar))",
+		"ALTER TABLE `hoge` DROP `foo`, DROP INDEX `foo`, ADD `bar` INT(10) UNSIGNED NOT NULL , ADD INDEX `bar` (`bar`);",
+	)
+	testDiffTable(
+		t,
+		"unique key",
+		"CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, foo int(10) unsigned not null, unique key foo (foo))",
+		"CREATE TABLE hoge (id int unsigned not null AUTO_INCREMENT, bar int(10) unsigned not null, unique key bar (bar))",
+		"ALTER TABLE `hoge` DROP `foo`, DROP INDEX `foo`, ADD `bar` INT(10) UNSIGNED NOT NULL , ADD UNIQUE INDEX `bar` (`bar`);",
+	)
+}
+
+func testDiffTable(t *testing.T, name, before string, after string, expected string) {
 	beforeStmt := parseCreateTableStatement(t, before)
 	afterStmt := parseCreateTableStatement(t, after)
 	result := ExtractTableSchemaDifference(beforeStmt, afterStmt)
-	if len(result.Added) != 2 {
-		t.Errorf("Expect len(Added) to 2, But Got %d", len(result.Added))
-		return
-	}
-	if len(result.Removed) != 2 {
-		t.Errorf("Expect len(Removed) to 2, But Got %d", len(result.Removed))
-		return
-	}
-	if !checkColumn(result.Added[0], "`bar`") {
-		t.Errorf("column bar should be added")
-	}
-	if !checkColumn(result.Removed[0], "`foo`") {
-		t.Errorf("column foo should be added")
-	}
-	if !checkIndex(result.Added[1], "`bar`") {
-		t.Errorf("index bar should be added")
-	}
-	if !checkIndex(result.Removed[1], "`foo`") {
-		t.Errorf("index bar should be added")
-	}
-	if result.ToQuery() != "ALTER TABLE `hoge` DROP `foo`, DROP INDEX `foo`, ADD `bar` INT(10) UNSIGNED NOT NULL , ADD INDEX `bar` (`bar`);" {
-		t.Errorf("diff query got \"%s\"", result.ToQuery())
+	sql := result.ToQuery()
+	if sql != expected {
+		t.Errorf("failed to testDiffTable \"%s\":\nBefore schema:\n%s\nAfter schema:\n%s\nExpected diff: \t%s\nBut got: \t%s", name, before, after, expected, sql);
 	}
 }
 
