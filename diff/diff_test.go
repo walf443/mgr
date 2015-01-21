@@ -57,6 +57,9 @@ func TestDiffTable(t *testing.T) {
 	if !checkIndex(result.Removed[1], "`foo`") {
 		t.Errorf("index bar should be added")
 	}
+	if result.ToQuery() != "ALTER TABLE `hoge` DROP `foo`, DROP INDEX `foo`, ADD `bar` INT(10) UNSIGNED NOT NULL , ADD INDEX `bar` (`bar`);" {
+		t.Errorf("diff query got \"%s\"", result.ToQuery())
+	}
 }
 
 func parseSQL(t *testing.T, sql string) []mysql.Statement {
