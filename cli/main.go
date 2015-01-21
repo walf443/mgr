@@ -36,12 +36,12 @@ func main() {
 
 	beforeStmts, err := parseSchema(beforeSchema)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to parse file: %s, %q\n", beforeFile, err)
+		fmt.Fprintf(os.Stderr, "failed to parse file: %s\n%s\n", *beforeFile, err)
 		os.Exit(1)
 	}
 	afterStmts, err := parseSchema(afterSchema)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to parse file: %s, %q\n", afterFile, err)
+		fmt.Fprintf(os.Stderr, "failed to parse file: %s\n%s\n", *afterFile, err)
 		os.Exit(1)
 	}
 	result := diff.Extract(beforeStmts, afterStmts)
