@@ -33,7 +33,6 @@ func Extract(before []mysql.Statement, after []mysql.Statement) *DatabaseSchemaD
 		if v, ok := stmt.(*mysql.CreateTableStatement); ok {
 			key := v.TableName.ToQuery()
 			if _, ok := tableNameOf[key]; ok {
-				// TODO: detect Modified
 				if v.ToQuery() != tableNameOf[key].ToQuery() {
 					result.Modified = append(result.Modified, ExtractTableSchemaDifference(tableNameOf[key], v))
 				}
