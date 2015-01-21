@@ -23,10 +23,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	beforeSchema, err := loadFile(*beforeFile)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to load file: %q\n", err)
-		os.Exit(1)
+	beforeSchema := ""
+	var err error
+	if *beforeFile == "stdin" {
+		beforeSchema,  err = loadStdin()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to load file: %q\n", err)
+			os.Exit(1)
+		}
+	} else {
+		beforeSchema, err = loadFile(*beforeFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to load file: %q\n", err)
+			os.Exit(1)
+		}
 	}
 	afterSchema, err := loadFile(*afterFile)
 	if err != nil {
@@ -53,6 +63,14 @@ func main() {
 
 func loadFile(fname string) (string, error) {
 	result, err := ioutil.ReadFile(fname)
+	if err != nil {
+		return "", err
+	}
+	return string(result), nil
+}
+
+func loadStdin() (string, error) {
+	result, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		return "", err
 	}
