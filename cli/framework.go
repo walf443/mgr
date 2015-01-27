@@ -6,14 +6,14 @@ type Framework interface {
 	GetCurrentSchema() (string, error)
 }
 
-var SupportFrameworks []Framework
+var SupportingFrameworks []Framework
 
 func init() {
-	SupportFrameworks = append(SupportFrameworks, &RubyOnRailsFramework{})
+	SupportingFrameworks = append(SupportingFrameworks, &RubyOnRailsFramework{})
 }
 
 func DetectFramework() Framework {
-	for _, framework := range SupportFrameworks {
+	for _, framework := range SupportingFrameworks {
 		if ( framework.DetectFramework() ) {
 			return framework
 		}
