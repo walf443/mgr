@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	var beforeFile = flag.String("before", "", "before schema filename")
+	var beforeFile = flag.String("before", "", "before schema filename. if \"stdin\" given, read from os.Stdin")
 	var afterFile  = flag.String("after", "",  "after schema filename")
 	flag.Parse()
 	if os.Getenv("DEBUG") == "" {
