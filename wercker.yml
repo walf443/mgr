@@ -18,4 +18,4 @@ build:
   - script:
       name: output release tag
       code: |
-        go describe --tags --exact --match 'v*' > $WERCKER_OUTPUT_DIR/.release_tag || true
+        git describe --tags --exact --match 'v*' > $WERCKER_OUTPUT_DIR/.release_tag || true
