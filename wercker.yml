@@ -1,1 +1,1 @@
-box: wercker/default
+box: walf443/wercker-box-goxc-build
