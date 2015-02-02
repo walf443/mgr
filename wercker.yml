@@ -1,1 +1,21 @@
 box: walf443/goxc-build@0.0.1
+build:
+  steps:
+  - setup-go-workspace
+  - script:
+      name: go get
+      code: |
+        go version
+  - script:
+      name: build & test
+      code: |
+        make get-deps
+        make test
+  - script:
+      name: build & test
+      code: |
+        cp mgr $WERCKER_OUTPUT_DIR/
+  - script:
+      name: output release tag
+      code: |
+        go describe --tags --exact --match 'v*' > $WERCKER_OUTPUT_DIR/.release_tag || true
