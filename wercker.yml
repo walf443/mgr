@@ -12,7 +12,7 @@ build:
         make get-deps
         make test
   - script:
-      name: build & test
+      name: make dist
       code: |
         cp mgr $WERCKER_OUTPUT_DIR/
   - script:
